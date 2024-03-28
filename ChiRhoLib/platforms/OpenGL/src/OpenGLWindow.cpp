@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Core/Base.h"
 #include "OpenGL/include/OpenGLWindow.h"
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
@@ -6,20 +7,16 @@
 #include <stdio.h>
 #include <GLFW/glfw3.h>
 
+#include <stb_image.h>
+
 namespace ChiRho
 {
-    // Only 1 instance of GLFW allowed
-    // Also, only 1 error callback
+
     static bool s_GLFWInitialized = false;
+
     static void GLFWErrorCallback(int error, const char* description)
     {
         CR_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
-    }
-    // Set up window Create function to return OpenGLWindow
-
-    Window* Window::Create(const WindowProps& props)
-    {
-        return new OpenGLWindow(props);
     }
 
     OpenGLWindow::OpenGLWindow(const WindowProps& props)
@@ -29,56 +26,47 @@ namespace ChiRho
 
     OpenGLWindow::~OpenGLWindow()
     {
+        Shutdown();
     }
-    void OpenGLWindow::OnUpdate()
-    {
-    }
-    void OpenGLWindow::SetVSync(bool enabled)
-    {
-        if(enabled)
-        {
-            glfwSwapInterval(1); // Enable vsync
-        } else {
-            glfwSwapInterval(0); // Disable vsync
-        }
 
-    }
     void OpenGLWindow::Init(const WindowProps& props)
     {
         m_Data.Title = props.Title;
+        m_Data.IconFile = props.IconPath;
+        // Load icon file
+        m_Data.Icons[0].pixels = stbi_load(props.IconPath.c_str(), &m_Data.Icons[0].width, &m_Data.Icons[0].height, 0, 4);
+        if(m_Data.Icons[0].pixels == NULL)
+        {
+            CR_CORE_CRITICAL("Icon cannot be loaded at {0}", props.IconPath);
+        } else {
+            CR_CORE_CRITICAL("Icon was loaded at {0}", props.IconPath);
+        }
         m_Data.Width = props.Width;
         m_Data.Height = props.Height;
 
-        CR_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+        CR_CORE_INFO("Creating window {0} with icon {1} ({2}, {3})", props.Title, props.IconPath, props.Width, props.Height);
 
-        if(!s_GLFWInitialized) // Used to initialize GLFW
+        if(!s_GLFWInitialized)
         {
             int success = glfwInit();
-            //CR_CORE_ASSERT(success, "Could not intialize GLFW!");
+            CR_CORE_ASSERT(success, "Could not initialize GLFW!");
             // Set error callback
             glfwSetErrorCallback(GLFWErrorCallback);
             s_GLFWInitialized = true;
         }
-        // Set version
-        const char* glsl_version = "#version 410";
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-        // Create a new window
+
+        // Setup window
         m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-        if(m_Window==nullptr)
-            CR_CORE_CRITICAL("FAILED TO CREATE WINDOW");
-        // Create rendering context
-        glfwMakeContextCurrent(m_Window);
+        glfwSetWindowIcon(m_Window, 1, m_Data.Icons);
+        m_Context = CreateScope<OpenGLRenderContext>(m_Window);
+        m_Context->Init();
         glfwSetWindowUserPointer(m_Window, &m_Data);
         SetVSync(true);
-
-        // Set GLFW callbacks
-
         // Set GLFW callbacks
         glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
         {
             WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-            WindowResizedEvent event(width, height);
+            WindowResizeEvent event(width, height);
             data.Width = width;
             data.Height = height;
             data.EventCallback(event);
@@ -150,45 +138,33 @@ namespace ChiRho
             MouseMovedEvent event((float)x, (float)y);
             data.EventCallback(event);
         });
-
-        // Setup Dear ImGui Context
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
-        io.BackendFlags |= ImGuiBackendFlags_PlatformHasViewports;
-        io.BackendFlags |= ImGuiBackendFlags_RendererHasViewports;
-
-        // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
-        //ImGui::StyleColorsLight();
-
-        // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-        ImGuiStyle& style = ImGui::GetStyle();
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            style.WindowRounding = 0.0f;
-            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-        }
-
-        // Setup Platform/Renderer backends
-        ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
-        ImGui_ImplOpenGL3_Init(glsl_version);
-        // Load fonts
     }
+
     void OpenGLWindow::Shutdown()
     {
-        // Cleanup
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
+        stbi_image_free(m_Data.Icons[0].pixels);
         glfwDestroyWindow(m_Window);
-        glfwTerminate();
     }
 
-    
+    void OpenGLWindow::OnUpdate()
+    {
+        
+        if(!glfwWindowShouldClose(m_Window))
+        {
+            glfwPollEvents();
+            m_Context->SwapBuffers();
+            // Make sure icon isn't changed when windows are popped out
+            glfwSetWindowIcon(m_Window, 1, m_Data.Icons);
+        }
+    }
+
+    void OpenGLWindow::SetVSync(bool enabled)
+    {
+        
+        if(enabled)
+            glfwSwapInterval(1);
+        else
+            glfwSwapInterval(0);
+    }
 } // namespace ChiRho
 

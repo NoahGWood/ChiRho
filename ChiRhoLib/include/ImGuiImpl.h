@@ -14,6 +14,7 @@ namespace ChiRho
         void Init();
         void Shutdown();
         void Render();
+        bool enableTest = true;
     };
     static void glfw_error_callback(int error, const char* description);
 } // namespace ChiRho

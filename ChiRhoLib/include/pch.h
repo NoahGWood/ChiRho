@@ -10,8 +10,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Base.h"
-#include "Logger.h"
+#include "Core/Base.h"
+#include "Core/Logger.h"
 
 #ifndef BIT
     #define BIT(x) (1<<x)

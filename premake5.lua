@@ -11,6 +11,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
     include "depends"
+    include "vendor/glad"
     include "vendor/imgui"
 
 group ""

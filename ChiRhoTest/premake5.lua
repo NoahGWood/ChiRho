@@ -30,6 +30,7 @@ project "ChiRhoTest"
         "ChiRhoLib",
         "ImGui",
         "glfw",
+        "Glad",
         "GL",
     }
 

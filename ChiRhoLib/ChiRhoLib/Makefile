@@ -22,7 +22,7 @@ RESCOMP = windres
 PCH = ../include/pch.h
 PCH_PLACEHOLDER = $(OBJDIR)/$(notdir $(PCH))
 GCH = $(PCH_PLACEHOLDER).gch
-INCLUDES += -I../include -I../../vendor/spdlog/include -I../../vendor/imgui
+INCLUDES += -I../include -I../platforms -I../../vendor/glad/include -I../../vendor/spdlog/include -I../../vendor/imgui -I../../vendor/stb_image
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
@@ -41,8 +41,8 @@ OBJDIR = ../../build/Debug-linux-x86_64/ChiRhoLib
 DEFINES += -DCR_PLATFORM_LINUX -DCR_DEBUG
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -std=c++2a
-LIBS += ../../bin/Debug-linux-x86_64/ImGui/libImGui.a -lglfw -lGL
-LDDEPS += ../../bin/Debug-linux-x86_64/ImGui/libImGui.a
+LIBS += ../../bin/Debug-linux-x86_64/Glad/libGlad.a ../../bin/Debug-linux-x86_64/ImGui/libImGui.a -lglfw -lGL
+LDDEPS += ../../bin/Debug-linux-x86_64/Glad/libGlad.a ../../bin/Debug-linux-x86_64/ImGui/libImGui.a
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64
 
 else ifeq ($(config),release)
@@ -52,8 +52,8 @@ OBJDIR = ../../build/Release-linux-x86_64/ChiRhoLib
 DEFINES += -DCR_PLATFORM_LINUX -DCR_RELEASE
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++2a
-LIBS += ../../bin/Release-linux-x86_64/ImGui/libImGui.a -lglfw -lGL
-LDDEPS += ../../bin/Release-linux-x86_64/ImGui/libImGui.a
+LIBS += ../../bin/Release-linux-x86_64/Glad/libGlad.a ../../bin/Release-linux-x86_64/ImGui/libImGui.a -lglfw -lGL
+LDDEPS += ../../bin/Release-linux-x86_64/Glad/libGlad.a ../../bin/Release-linux-x86_64/ImGui/libImGui.a
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
 
 else ifeq ($(config),dist)
@@ -63,8 +63,8 @@ OBJDIR = ../../build/Dist-linux-x86_64/ChiRhoLib
 DEFINES += -DCR_PLATFORM_LINUX -DCR_DIST
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++2a
-LIBS += ../../bin/Dist-linux-x86_64/ImGui/libImGui.a -lglfw -lGL
-LDDEPS += ../../bin/Dist-linux-x86_64/ImGui/libImGui.a
+LIBS += ../../bin/Dist-linux-x86_64/Glad/libGlad.a ../../bin/Dist-linux-x86_64/ImGui/libImGui.a -lglfw -lGL
+LDDEPS += ../../bin/Dist-linux-x86_64/Glad/libGlad.a ../../bin/Dist-linux-x86_64/ImGui/libImGui.a
 ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
 
 endif
@@ -80,13 +80,25 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/Application.o
+GENERATED += $(OBJDIR)/ImGUIBuild.o
 GENERATED += $(OBJDIR)/ImGuiImpl.o
+GENERATED += $(OBJDIR)/ImGuiLayer.o
 GENERATED += $(OBJDIR)/Logger.o
+GENERATED += $(OBJDIR)/OpenGLRenderContext.o
+GENERATED += $(OBJDIR)/OpenGLWindow.o
+GENERATED += $(OBJDIR)/Window.o
 GENERATED += $(OBJDIR)/pch.o
+GENERATED += $(OBJDIR)/stb_image.o
 OBJECTS += $(OBJDIR)/Application.o
+OBJECTS += $(OBJDIR)/ImGUIBuild.o
 OBJECTS += $(OBJDIR)/ImGuiImpl.o
+OBJECTS += $(OBJDIR)/ImGuiLayer.o
 OBJECTS += $(OBJDIR)/Logger.o
+OBJECTS += $(OBJDIR)/OpenGLRenderContext.o
+OBJECTS += $(OBJDIR)/OpenGLWindow.o
+OBJECTS += $(OBJDIR)/Window.o
 OBJECTS += $(OBJDIR)/pch.o
+OBJECTS += $(OBJDIR)/stb_image.o
 
 # Rules
 # #############################################
@@ -150,13 +162,31 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/stb_image.o: ../../vendor/stb_image/stb_image.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) -include $(PCH_PLACEHOLDER) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/OpenGLRenderContext.o: ../platforms/OpenGL/src/OpenGLRenderContext.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) -include $(PCH_PLACEHOLDER) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/OpenGLWindow.o: ../platforms/OpenGL/src/OpenGLWindow.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) -include $(PCH_PLACEHOLDER) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Application.o: ../src/Application.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) -include $(PCH_PLACEHOLDER) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ImGUIBuild.o: ../src/ImGUIBuild.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) -include $(PCH_PLACEHOLDER) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/ImGuiImpl.o: ../src/ImGuiImpl.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) -include $(PCH_PLACEHOLDER) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ImGuiLayer.o: ../src/ImGuiLayer.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) -include $(PCH_PLACEHOLDER) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Logger.o: ../src/Logger.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) -include $(PCH_PLACEHOLDER) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/Window.o: ../src/Window.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) -include $(PCH_PLACEHOLDER) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/pch.o: ../src/pch.cpp

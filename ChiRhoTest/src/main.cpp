@@ -1,5 +1,5 @@
 #include <ChiRho.h>
-#include <Entry.h>
+#include <Core/Entry.h>
 #include <imgui.h>
 
 class ChiRhoTest : public ChiRho::Application

@@ -26,3 +26,9 @@ namespace ChiRho
 } // namespace ChiRho
 
 #include "Logger.h"
+#include "Core/Assert.h"
+#include "Events/Event.h"
+#include "Events/ApplicationEvent.h"
+#include "Events/KeyEvent.h"
+#include "Events/WindowEvent.h"
+#include "Events/MouseEvent.h"

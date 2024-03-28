@@ -9,16 +9,19 @@ ifndef verbose
 endif
 
 ifeq ($(config),debug)
+  Glad_config = debug
   ImGui_config = debug
   ChiRhoLib_config = debug
   ChiRhoTest_config = debug
 
 else ifeq ($(config),release)
+  Glad_config = release
   ImGui_config = release
   ChiRhoLib_config = release
   ChiRhoTest_config = release
 
 else ifeq ($(config),dist)
+  Glad_config = dist
   ImGui_config = dist
   ChiRhoLib_config = dist
   ChiRhoTest_config = dist
@@ -27,34 +30,41 @@ else
   $(error "invalid configuration $(config)")
 endif
 
-PROJECTS := ImGui ChiRhoLib ChiRhoTest
+PROJECTS := Glad ImGui ChiRhoLib ChiRhoTest
 
 .PHONY: all clean help $(PROJECTS) Dependencies
 
 all: $(PROJECTS)
 
-Dependencies: ImGui
+Dependencies: Glad ImGui
+
+Glad:
+ifneq (,$(Glad_config))
+	@echo "==== Building Glad ($(Glad_config)) ===="
+	@${MAKE} --no-print-directory -C vendor -f Glad.make config=$(Glad_config)
+endif
 
 ImGui:
 ifneq (,$(ImGui_config))
 	@echo "==== Building ImGui ($(ImGui_config)) ===="
-	@${MAKE} --no-print-directory -C vendor -f Makefile config=$(ImGui_config)
+	@${MAKE} --no-print-directory -C vendor -f ImGui.make config=$(ImGui_config)
 endif
 
-ChiRhoLib: ImGui
+ChiRhoLib: Glad ImGui
 ifneq (,$(ChiRhoLib_config))
 	@echo "==== Building ChiRhoLib ($(ChiRhoLib_config)) ===="
 	@${MAKE} --no-print-directory -C ChiRhoLib/ChiRhoLib -f Makefile config=$(ChiRhoLib_config)
 endif
 
-ChiRhoTest: ChiRhoLib ImGui
+ChiRhoTest: ChiRhoLib ImGui Glad
 ifneq (,$(ChiRhoTest_config))
 	@echo "==== Building ChiRhoTest ($(ChiRhoTest_config)) ===="
 	@${MAKE} --no-print-directory -C ChiRhoTest/ChiRhoTest -f Makefile config=$(ChiRhoTest_config)
 endif
 
 clean:
-	@${MAKE} --no-print-directory -C vendor -f Makefile clean
+	@${MAKE} --no-print-directory -C vendor -f Glad.make clean
+	@${MAKE} --no-print-directory -C vendor -f ImGui.make clean
 	@${MAKE} --no-print-directory -C ChiRhoLib/ChiRhoLib -f Makefile clean
 	@${MAKE} --no-print-directory -C ChiRhoTest/ChiRhoTest -f Makefile clean
 
@@ -69,6 +79,7 @@ help:
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
+	@echo "   Glad"
 	@echo "   ImGui"
 	@echo "   ChiRhoLib"
 	@echo "   ChiRhoTest"

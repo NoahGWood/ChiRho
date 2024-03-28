@@ -16,6 +16,10 @@ project "ChiRhoLib"
     {
         "%{wks.location}/ChiRhoLib/src/**.h",
         "%{wks.location}/ChiRhoLib/src/**.cpp",
+        "%{wks.location}/ChiRhoLib/platforms/**.h",
+        "%{wks.location}/ChiRhoLib/platforms/**.cpp",
+        "%{wks.location}/vendor/stb_image/**.h",
+        "%{wks.location}/vendor/stb_image/**.cpp",
 --		"%{wks.location}/vendor/imgui/backends/imgui_impl_glfw.h",
 --		"%{wks.location}/vendor/imgui/backends/imgui_impl_opengl3.h"
     }
@@ -23,14 +27,18 @@ project "ChiRhoLib"
     includedirs
     {
         "include",
+        "platforms/",
+        "%{IncludeDir.Glad}",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.ImGUI}",
+        "%{IncludeDir.stb_image}",
     }
     links
     {
-        "ImGui",
         "glfw",
-        "GL"
+        "Glad",
+        "GL",
+        "ImGui",
     }
 
     filter "system:windows"

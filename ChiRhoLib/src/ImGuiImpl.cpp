@@ -57,6 +57,8 @@ namespace ChiRho
         ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
         ImGui_ImplOpenGL3_Init(glsl_version);
         // Load fonts
+        // Enable/Disable secondary windows
+        io.ConfigViewportsNoDecoration = true; // False - Allow secondary windows
     }
     void ImGuiImpl::Shutdown()
     {
@@ -67,6 +69,7 @@ namespace ChiRho
         glfwDestroyWindow(m_Window);
         glfwTerminate();
     }
+    
     void ImGuiImpl::Render()
     {
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -85,8 +88,10 @@ namespace ChiRho
             ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
             // Start drawing in ImGui Panels
-            ImGui::Begin("Test");
-            ImGui::End();
+            if(enableTest){
+                ImGui::Begin("Test", &enableTest);
+                ImGui::End();                
+            }
             ImGui::ShowDemoWindow();
             // Render 
             ImGui::Render();

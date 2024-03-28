@@ -10,7 +10,7 @@ namespace ChiRho
 
             EVENT_CLASS_TYPE(AppTick)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)
-    }
+    };
 
     class AppUpdateEvent : public Event
     {
@@ -19,8 +19,7 @@ namespace ChiRho
 
             EVENT_CLASS_TYPE(AppUpdate)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)
-    }
-
+    };
 
     class AppRenderEvent : public Event
     {
@@ -29,5 +28,5 @@ namespace ChiRho
 
             EVENT_CLASS_TYPE(AppRender)
             EVENT_CLASS_CATEGORY(EventCategoryApplication)
-    }
+    };
 } // namespace ChiRho
