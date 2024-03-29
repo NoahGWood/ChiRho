@@ -30,3 +30,23 @@
 *.exe
 *.out
 *.app
+
+# Ignore build and bin folders
+bin/
+build/
+
+# Ignore makefiles
+Makefile
+*Makefile
+*.make
+*/*.make
+
+# Ignore shell scripts
+*.sh
+build_scripts/
+
+# Ignore .vscode
+.vscode/
+
+# Ignore .ini files
+*.ini
