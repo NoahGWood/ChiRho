@@ -1,6 +1,6 @@
 project "ChiRhoLib"
     location "ChiRhoLib"
-    kind "StaticLib"
+    kind "SharedLib"
     language "C++"
     cppdialect "C++2a"
     staticruntime "off"

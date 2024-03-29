@@ -26,7 +26,7 @@ INCLUDES += -I../include -I../platforms -I../../vendor/glad/include -I../../vend
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
+LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PREBUILDCMDS
 endef
 define PRELINKCMDS
@@ -36,36 +36,36 @@ endef
 
 ifeq ($(config),debug)
 TARGETDIR = ../../bin/Debug-linux-x86_64/ChiRhoLib
-TARGET = $(TARGETDIR)/libChiRhoLib.a
+TARGET = $(TARGETDIR)/libChiRhoLib.so
 OBJDIR = ../../build/Debug-linux-x86_64/ChiRhoLib
 DEFINES += -DCR_PLATFORM_LINUX -DCR_DEBUG
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -g -std=c++2a
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -fPIC -g
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -fPIC -g -std=c++2a
 LIBS += ../../bin/Debug-linux-x86_64/Glad/libGlad.a ../../bin/Debug-linux-x86_64/ImGui/libImGui.a -lglfw -lGL
 LDDEPS += ../../bin/Debug-linux-x86_64/Glad/libGlad.a ../../bin/Debug-linux-x86_64/ImGui/libImGui.a
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64
+ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -shared -Wl,-soname=libChiRhoLib.so
 
 else ifeq ($(config),release)
 TARGETDIR = ../../bin/Release-linux-x86_64/ChiRhoLib
-TARGET = $(TARGETDIR)/libChiRhoLib.a
+TARGET = $(TARGETDIR)/libChiRhoLib.so
 OBJDIR = ../../build/Release-linux-x86_64/ChiRhoLib
 DEFINES += -DCR_PLATFORM_LINUX -DCR_RELEASE
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++2a
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -fPIC
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -fPIC -std=c++2a
 LIBS += ../../bin/Release-linux-x86_64/Glad/libGlad.a ../../bin/Release-linux-x86_64/ImGui/libImGui.a -lglfw -lGL
 LDDEPS += ../../bin/Release-linux-x86_64/Glad/libGlad.a ../../bin/Release-linux-x86_64/ImGui/libImGui.a
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
+ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -shared -Wl,-soname=libChiRhoLib.so -s
 
 else ifeq ($(config),dist)
 TARGETDIR = ../../bin/Dist-linux-x86_64/ChiRhoLib
-TARGET = $(TARGETDIR)/libChiRhoLib.a
+TARGET = $(TARGETDIR)/libChiRhoLib.so
 OBJDIR = ../../build/Dist-linux-x86_64/ChiRhoLib
 DEFINES += -DCR_PLATFORM_LINUX -DCR_DIST
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -std=c++2a
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -fPIC
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -O2 -fPIC -std=c++2a
 LIBS += ../../bin/Dist-linux-x86_64/Glad/libGlad.a ../../bin/Dist-linux-x86_64/ImGui/libImGui.a -lglfw -lGL
 LDDEPS += ../../bin/Dist-linux-x86_64/Glad/libGlad.a ../../bin/Dist-linux-x86_64/ImGui/libImGui.a
-ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
+ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -shared -Wl,-soname=libChiRhoLib.so -s
 
 endif
 

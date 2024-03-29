@@ -18,3 +18,4 @@ group ""
 
 include "ChiRhoLib"
 include "ChiRhoTest"
+include "ChiRhoPi"
